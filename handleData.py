@@ -9,11 +9,6 @@ def SaveJson(sort_movies):
 		f.writelines(jsObj)
 	f.close()
 
-# def SaveCSV(sort_movies):
-# 	with open('stocks.csv','w') as f:
-# 	    f_csv = csv.DictWriter(f, headers)
-# 	    f_csv.writeheader()
-# 	    f_csv.writerows(sort_movies)
 
 def SaveTxt(sort_movies):
 	i = 1
