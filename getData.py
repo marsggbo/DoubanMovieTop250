@@ -45,7 +45,7 @@ def getMovieData():
 
 					# 电影简介获取之后是一个list，且一般有两个元素，所以要拼接起来
 					# 另外凭借后得到的字符串含有大量空格符和换行符，所以需要去掉
-					info = (infos[0] + infos[1]).replace(" ", '').replace('\n', '').replace('\xa0', ' ')
+					info = (infos[0] + infos[1]).replace(" ", '').replace('\n', '').replace('\xa0', '')
 
 					movie["name"] = name
 					movie["info"] = info
@@ -55,12 +55,14 @@ def getMovieData():
 					if quote:
 						movie["quote"] = quote
 					else:
-						movie["quote"] = ""
+						movie["quote"] = " "
 					movies.append(movie)
 				except Exception as e:
-					raise e
+					print("加载失败1")
+					# raise e
 	except Exception as e:
-		print('加载完毕')
+		print('加载失败2')
+		# raise e
 
 	# 按评分排序
 	movies = sorted(movies, key=lambda x: x['star'], reverse=True)

@@ -1,6 +1,7 @@
 #coding=utf-8
 from getData import getMovieData
 import json
+import pymysql
 
 def SaveJson(sort_movies):
 	f = open('DoubanMovie.json', 'w', encoding='utf-8')
@@ -16,12 +17,8 @@ def SaveTxt(sort_movies):
 		for movie in sort_movies:
 			name, info, star, quote = "", "", "", ""
 
-			# star是list类型，所以需要加上下标
 			star = movie["star"][0]
 
-			# 电影名称有很多个，所以需要用“+”运算拼接起来
-			# 但要注意必须在每次循环开始前初始化各个变量，否则就会使得之前的数据与后来的拼接在一起了
-			# 不要问我怎么知道的。。。。血的教训啊！！！
 			for x in movie["name"]:
 				name += str(x)
 			info = movie["info"]
@@ -31,3 +28,31 @@ def SaveTxt(sort_movies):
 			f.writelines(info + '\n')
 			f.writelines(quote)
 			i += 1
+
+
+def SaveMySQL(sort_movies):
+	try:
+		db = pymysql.connect(host="localhost",user="root",password="123456",db="doubanmovie",charset="utf8")
+
+		cursor = db.cursor()
+
+		# 为了避免以后更新数据时由于已经存在这个表而产生错误
+		# 所以if not exists 语句是判断是否已经有这个表，若没有则创建新表，有则跳过这一语句
+		cursor.execute("create table if not exists movie(name text, star text, quote text, info text)")		
+
+		for movie in sort_movies:
+			star = str(movie["star"][0]).replace(r"'",'')
+			name = str(movie["name"]).replace('[','').replace(']','').replace(r"'",'')
+			info = str(movie["info"].replace('[','').replace(']','')).replace(r"'",'')
+			quote = str(movie["quote"][0]).replace(r"'",'')
+			sql = "insert into movie(star,name,info,quote) values('%s', '%s', '%s', '%s');" % (star, name, info, quote)
+			print(sql + "\n********************\n")
+			try:
+				cursor.execute(sql)
+				db.commit()
+				print("数据插入成功\n*************\n")
+			except Exception as e:
+				raise e
+		db.close()		
+	except Exception as e:
+		raise e
